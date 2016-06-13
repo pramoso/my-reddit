@@ -6,18 +6,16 @@
 (function () {
     var app = angular.module('myreddit', ['ionic']);
 
-    app.controller('RedditCtrl', function ($scope) {
-       $scope.stories = [
-            {
-                title: 'First story'
-            },
-            {
-                title: 'Second story'      
-            },
-            {
-                title: 'Third story'
-            }
-       ];
+    app.controller('RedditCtrl', function ($http, $scope) {
+        $scope.stories = [];
+        
+        $http.get('https://www.reddit.com/r/Android/new/.json')
+            .success(function(response) {
+                angular.forEach(response.data.children, function (child) {
+                    $scope.stories.push(child.data);
+//                    console.log(child.data);
+                });
+        });
     });
     app.run(function($ionicPlatform) {
       $ionicPlatform.ready(function() {
