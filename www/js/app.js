@@ -10,11 +10,15 @@
         $scope.stories = [];
         
         function loadStories(params, callback) {
-            $http.get('https://www.reddit.com/r/funny/new/.json', {params : params})
+            $http.get('https://www.reddit.com/r/Android/new/.json', {params : params})
             .success(function(response) {
                 var stories = []
                 angular.forEach(response.data.children, function (child) {
-                    stories.push(child.data);
+                    var story = child.data;
+                    if (!story.thumbnail.startsWith('http')) {
+                        story.thumbnail = 'http://www.redditstatic.com/icon.png';
+                        }
+                    stories.push(story);
 //                    console.log(child.data);
                 });
                 callback(stories);
@@ -40,6 +44,10 @@
                 $scope.$broadcast('scroll.refreshComplete');
             })
         }
+
+        $scope.openLink = function (url) {
+            window.open(url, 'blank');
+        }
     });
     app.run(function($ionicPlatform) {
       $ionicPlatform.ready(function() {
@@ -52,6 +60,9 @@
           // from snapping when text inputs are focused. Ionic handles this internally for
           // a much nicer keyboard experience.
           cordova.plugins.Keyboard.disableScroll(true);
+        }
+        if (window.cordova && window.cordova.InAppBrowser) {
+            window.open = window.cordova.InAppBrowser.open;
         }
         if(window.StatusBar) {
           StatusBar.styleDefault();
